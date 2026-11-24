@@ -1,0 +1,12 @@
+{
+  "name": "qaflow-postman-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Runner local de la colección Postman v2.1 de QAFlow.",
+  "scripts": {
+    "api:test": "newman run QAFlow_Postman_Collection.json -e QAFlow_Postman_Environment.json --reporters cli,json --reporter-json-export Evidencias/Newman_QAFlow_Resultados.json"
+  },
+  "devDependencies": {
+    "newman": "^6.2.2"
+  }
+}

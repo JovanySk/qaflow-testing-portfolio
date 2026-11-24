@@ -1,0 +1,17 @@
+QAFlow - Ejecución de validaciones SQL
+Fecha UTC: 2026-07-20T05:40:05.865Z
+Motor: MySQL 8.0.40 / base qaflow_portfolio
+
+validation_id	category	validation_description	anomaly_count	validation_status
+SQL-001	SKU duplicados	Detecta más de un producto para el mismo SKU sin distinguir mayúsculas.	0	PASSED
+SQL-002	Cantidades negativas	Busca precios, stocks, movimientos o cantidades con valores negativos o nulos inválidos.	0	PASSED
+SQL-003	Integridad referencial	Identifica registros huérfanos entre productos, pedidos, BOM, producción e inspecciones.	0	PASSED
+SQL-004	Existencia de productos	Confirma la existencia de los tres SKU obligatorios del conjunto de pruebas.	0	PASSED
+SQL-005	Movimientos de inventario	Valida la aritmética interna de cada entrada y salida registrada.	0	PASSED
+SQL-006	Cálculo de stock	Compara el stock persistido contra la suma de entradas menos salidas.	0	PASSED
+SQL-007	Órdenes sin BOM	Busca órdenes de producción activas o completadas sin una BOM válida y activa.	0	PASSED
+SQL-008	Órdenes completadas sin inspección	Detecta órdenes completadas que no cuentan con inspección de calidad.	0	PASSED
+SQL-009	Rechazos sin observaciones	Detecta inspecciones rechazadas sin una explicación documentada.	0	PASSED
+SQL-010	Auditoría	Confirma eventos de auditoría para las entidades críticas del conjunto de datos.	0	PASSED
+total_validations	passed_validations	failed_validations
+10	10	0

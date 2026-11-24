@@ -1,0 +1,10 @@
+{
+  "valido": {
+    "username": "qa.admin",
+    "password": "QaflowDemo#2026"
+  },
+  "invalido": {
+    "username": "qa.admin",
+    "password": "WrongPassword#1"
+  }
+}

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="QAFlow, plataforma de gestión de operaciones de manufactura." />
+    <title>QAFlow · Manufacturing Management</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Saltar al contenido</a>
+    <div class="grain" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="QAFlow, inicio">
+        <span class="brand-mark" aria-hidden="true">QF</span>
+        <span>
+          <strong>QAFlow</strong>
+          <small>Manufacturing Management</small>
+        </span>
+      </a>
+    </header>
+
+    <main id="main">
+      <section id="login-view" class="login-layout" aria-labelledby="login-title">
+        <div class="intro-panel">
+          <p class="eyebrow">PLATAFORMA DE MANUFACTURA</p>
+          <h1>Control de<br /><span>operaciones.</span></h1>
+          <p class="intro-copy">
+            Gestiona productos, inventario y operaciones de manufactura desde un solo panel.
+          </p>
+          <div class="scope-rail" aria-label="Alcance funcional">
+            <span>01 LOGIN</span>
+            <span>02 PRODUCTOS</span>
+            <span>03 INVENTARIO</span>
+          </div>
+        </div>
+
+        <article class="panel login-panel">
+          <h2 id="login-title">Iniciar sesión</h2>
+          <p class="panel-description">Ingresa tus credenciales para acceder al sistema.</p>
+
+          <form id="login-form" data-cy="login-form" novalidate>
+            <label for="username">Usuario</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              autocomplete="username"
+              data-cy="login-username"
+            />
+
+            <label for="password">Contraseña</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              data-cy="login-password"
+            />
+
+            <button class="button button-primary" type="submit" data-cy="login-submit">
+              <span>Iniciar sesión</span><span aria-hidden="true">→</span>
+            </button>
+            <p id="login-message" class="form-message" data-cy="login-message" role="status" aria-live="polite"></p>
+          </form>
+
+          <dl class="credentials-hint">
+            <div><dt>Usuario</dt><dd>qa.admin</dd></div>
+            <div><dt>Contraseña</dt><dd>QaflowDemo#2026</dd></div>
+          </dl>
+        </article>
+      </section>
+
+      <section id="app-view" class="dashboard" data-cy="app-shell" aria-labelledby="dashboard-title" hidden>
+        <aside class="sidebar">
+          <div>
+            <p class="eyebrow">CONTROL DE SESIÓN</p>
+            <p class="operator-label">Operador autenticado</p>
+            <strong id="current-user" data-cy="current-user">—</strong>
+          </div>
+          <nav aria-label="Secciones de QAFlow">
+            <a href="#products-section"><span>01</span> Productos</a>
+            <a href="#new-product-section"><span>02</span> Alta de producto</a>
+            <a href="#inventory-section"><span>03</span> Inventario</a>
+          </nav>
+          <button id="logout-button" class="button button-ghost" type="button" data-cy="logout-button">Cerrar sesión</button>
+        </aside>
+
+        <div class="workspace">
+          <header class="workspace-header">
+            <div>
+              <p class="eyebrow">CONTROL DE MANUFACTURA</p>
+              <h2 id="dashboard-title">Panel operativo</h2>
+            </div>
+            <div class="environment-tag">PRODUCTOS · INVENTARIO · OPERACIONES</div>
+          </header>
+
+          <section id="products-section" class="panel data-panel" aria-labelledby="products-title">
+            <div class="section-heading">
+              <div>
+                <p class="kicker">Consulta</p>
+                <h3 id="products-title">Productos registrados</h3>
+              </div>
+              <button id="refresh-products" class="button button-ghost compact" type="button" data-cy="products-refresh">Actualizar</button>
+            </div>
+            <div class="table-shell">
+              <table data-cy="products-table">
+                <thead><tr><th>ID</th><th>SKU</th><th>Producto</th><th>Precio</th><th>Stock</th><th>Estado</th></tr></thead>
+                <tbody id="products-body" data-cy="products-list"></tbody>
+              </table>
+            </div>
+            <p id="products-message" class="form-message" role="status" aria-live="polite"></p>
+          </section>
+
+          <div class="form-grid">
+            <section id="new-product-section" class="panel" aria-labelledby="new-product-title">
+              <div class="panel-code" aria-hidden="true">PRODUCT_CREATE / 02</div>
+              <p class="kicker">Catálogo</p>
+              <h3 id="new-product-title">Crear producto</h3>
+              <form id="product-form" class="stack-form" data-cy="product-form" novalidate>
+                <div class="field-pair">
+                  <div><label for="product-sku">SKU</label><input id="product-sku" name="sku" maxlength="48" data-cy="product-sku" /></div>
+                  <div><label for="product-price">Precio unitario</label><input id="product-price" name="unitPrice" type="number" min="0" step="0.01" data-cy="product-price" /></div>
+                </div>
+                <label for="product-name">Nombre</label>
+                <input id="product-name" name="name" maxlength="120" data-cy="product-name" />
+                <label for="product-description">Descripción</label>
+                <textarea id="product-description" name="description" maxlength="300" rows="3" data-cy="product-description"></textarea>
+                <button class="button button-primary" type="submit" data-cy="product-submit">Registrar producto</button>
+                <p id="product-message" class="form-message" data-cy="product-message" role="status" aria-live="polite"></p>
+              </form>
+            </section>
+
+            <section id="inventory-section" class="panel" aria-labelledby="inventory-title">
+              <div class="panel-code" aria-hidden="true">STOCK_MOVEMENT / 03</div>
+              <p class="kicker">Existencias</p>
+              <h3 id="inventory-title">Movimiento de inventario</h3>
+              <form id="inventory-form" class="stack-form" data-cy="inventory-form" novalidate>
+                <div class="field-pair">
+                  <div><label for="inventory-product">ID producto</label><input id="inventory-product" name="productId" type="number" min="1" step="1" data-cy="inventory-product-id" /></div>
+                  <div><label for="inventory-type">Movimiento</label><select id="inventory-type" name="type" data-cy="inventory-type"><option value="ENTRY">Entrada</option><option value="EXIT">Salida</option></select></div>
+                </div>
+                <label for="inventory-quantity">Cantidad</label>
+                <input id="inventory-quantity" name="quantity" type="number" min="1" step="1" data-cy="inventory-quantity" />
+                <label for="inventory-notes">Observaciones</label>
+                <textarea id="inventory-notes" name="notes" maxlength="300" rows="3" data-cy="inventory-notes"></textarea>
+                <button class="button button-primary" type="submit" data-cy="inventory-submit">Aplicar movimiento</button>
+                <p id="inventory-message" class="form-message" data-cy="inventory-message" role="status" aria-live="polite"></p>
+              </form>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>QAFLOW · MANUFACTURING MANAGEMENT</span>
+      <span>PRODUCTOS · INVENTARIO · OPERACIONES</span>
+    </footer>
+  </body>
+</html>

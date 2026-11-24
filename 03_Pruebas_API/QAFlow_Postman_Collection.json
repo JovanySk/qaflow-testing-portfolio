@@ -1,0 +1,330 @@
+{
+  "info": {
+    "_postman_id": "4e6f4c27-f957-4b12-b60d-4a35c6aaf301",
+    "name": "QAFlow Manufacturing API",
+    "description": "Colección importable para validar los endpoints críticos del sistema simplificado utilizado como objeto de pruebas. Ejecutar en el orden definido para conservar las variables dinámicas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('Tiempo de respuesta menor a 2000 ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});",
+          "",
+          "pm.test('Content-Type es JSON', function () {",
+          "    const contentType = pm.response.headers.get('Content-Type');",
+          "    pm.expect(contentType, 'Content-Type obligatorio').to.be.a('string');",
+          "    pm.expect(contentType.toLowerCase()).to.include('application/json');",
+          "});",
+          "",
+          "pm.test('La respuesta contiene una estructura JSON raíz válida', function () {",
+          "    const body = pm.response.json();",
+          "    pm.expect(body).to.be.an('object');",
+          "    pm.expect(Object.prototype.hasOwnProperty.call(body, 'data') || Object.prototype.hasOwnProperty.call(body, 'error')).to.equal(true);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Login exitoso",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Login devuelve token y usuario con tipos válidos', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.have.property('data').that.is.an('object');",
+              "    pm.expect(body.data).to.have.all.keys('token', 'user');",
+              "    pm.expect(body.data.token).to.be.a('string').and.not.empty;",
+              "    pm.expect(body.data.user).to.be.an('object');",
+              "    pm.expect(body.data.user).to.include.all.keys('id', 'username', 'role');",
+              "    pm.expect(body.data.user.id).to.be.a('number');",
+              "    pm.expect(body.data.user.username).to.be.a('string').and.equal('qa.admin');",
+              "    pm.expect(body.data.user.role).to.be.a('string').and.equal('ADMIN');",
+              "    pm.environment.set('authToken', body.data.token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json", "type": "text" },
+          { "key": "Accept", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"qa.admin\",\n  \"password\": \"QaflowDemo#2026\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        },
+        "description": "Autentica al usuario administrador local y almacena el token en authToken."
+      },
+      "response": []
+    },
+    {
+      "name": "02 - Login incorrecto",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401', function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test('Error de credenciales contiene campos obligatorios', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.have.property('error').that.is.an('object');",
+              "    pm.expect(body.error).to.have.all.keys('code', 'message');",
+              "    pm.expect(body.error.code).to.be.a('string').and.equal('INVALID_CREDENTIALS');",
+              "    pm.expect(body.error.message).to.be.a('string').and.equal('Credenciales incorrectas.');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json", "type": "text" },
+          { "key": "Accept", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"qa.admin\",\n  \"password\": \"credencial-incorrecta\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "login"]
+        },
+        "description": "Valida el rechazo controlado de una contraseña incorrecta."
+      },
+      "response": []
+    },
+    {
+      "name": "03 - Consultar productos",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('La colección de productos tiene estructura y tipos válidos', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.have.property('data').that.is.an('array');",
+              "    pm.expect(body.data.length).to.be.above(0);",
+              "    body.data.forEach(function (product) {",
+              "        pm.expect(product).to.include.all.keys('id', 'sku', 'name', 'unitPrice', 'stock', 'active');",
+              "        pm.expect(product.id).to.be.a('number');",
+              "        pm.expect(product.sku).to.be.a('string').and.not.empty;",
+              "        pm.expect(product.name).to.be.a('string').and.not.empty;",
+              "        pm.expect(product.unitPrice).to.be.a('number');",
+              "        pm.expect(product.stock).to.be.a('number');",
+              "        pm.expect(product.active).to.be.a('number');",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/json", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products"]
+        },
+        "description": "Consulta todos los productos usando el token almacenado."
+      },
+      "response": []
+    },
+    {
+      "name": "04 - Crear producto",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const uniqueSku = `QA-PM-${Date.now()}-${pm.variables.replaceIn('{{$randomInt}}')}`;",
+              "pm.environment.set('productSku', uniqueSku);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Producto creado contiene campos y tipos obligatorios', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.have.property('data').that.is.an('object');",
+              "    pm.expect(body.data).to.include.all.keys('id', 'sku', 'name', 'description', 'unitPrice', 'stock', 'active');",
+              "    pm.expect(body.data.id).to.be.a('number');",
+              "    pm.expect(body.data.sku).to.be.a('string').and.equal(pm.environment.get('productSku'));",
+              "    pm.expect(body.data.name).to.be.a('string').and.not.empty;",
+              "    pm.expect(body.data.unitPrice).to.be.a('number').and.equal(275.5);",
+              "    pm.expect(body.data.stock).to.be.a('number').and.equal(0);",
+              "    pm.expect(body.data.active).to.be.a('boolean').and.equal(true);",
+              "    pm.environment.set('productId', String(body.data.id));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json", "type": "text" },
+          { "key": "Accept", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sku\": \"{{productSku}}\",\n  \"name\": \"Componente Postman QA\",\n  \"description\": \"Producto dinámico creado por la colección QAFlow.\",\n  \"unitPrice\": 275.50\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products"]
+        },
+        "description": "Genera un SKU único, crea el producto y almacena productId y productSku."
+      },
+      "response": []
+    },
+    {
+      "name": "05 - Rechazar SKU duplicado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409', function () {",
+              "    pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test('El error identifica el SKU duplicado', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.have.property('error').that.is.an('object');",
+              "    pm.expect(body.error).to.have.all.keys('code', 'message');",
+              "    pm.expect(body.error.code).to.be.a('string').and.equal('DUPLICATE_SKU');",
+              "    pm.expect(body.error.message).to.be.a('string').and.include(pm.environment.get('productSku'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json", "type": "text" },
+          { "key": "Accept", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sku\": \"{{productSku}}\",\n  \"name\": \"Producto duplicado\",\n  \"description\": \"Debe ser rechazado por la restricción única.\",\n  \"unitPrice\": 275.50\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products"]
+        },
+        "description": "Reutiliza productSku para validar el HTTP 409."
+      },
+      "response": []
+    },
+    {
+      "name": "06 - Rechazar salida con stock insuficiente",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409', function () {",
+              "    pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test('El error de stock contiene mensaje, código y detalle tipado', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body).to.have.property('error').that.is.an('object');",
+              "    pm.expect(body.error).to.include.all.keys('code', 'message', 'details');",
+              "    pm.expect(body.error.code).to.be.a('string').and.equal('INSUFFICIENT_STOCK');",
+              "    pm.expect(body.error.message).to.be.a('string').and.include('Stock insuficiente');",
+              "    pm.expect(body.error.details).to.have.all.keys('availableStock', 'requestedQuantity');",
+              "    pm.expect(body.error.details.availableStock).to.be.a('number').and.equal(0);",
+              "    pm.expect(body.error.details.requestedQuantity).to.be.a('number').and.equal(999999);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json", "type": "text" },
+          { "key": "Accept", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productId\": {{productId}},\n  \"type\": \"EXIT\",\n  \"quantity\": 999999,\n  \"notes\": \"Solicitud intencionalmente superior al stock disponible.\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/inventory/movements",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "inventory", "movements"]
+        },
+        "description": "Solicita una salida superior al stock cero del producto recién creado."
+      },
+      "response": []
+    }
+  ],
+  "variable": []
+}

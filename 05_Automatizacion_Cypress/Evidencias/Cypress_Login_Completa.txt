@@ -1,0 +1,82 @@
+Warning: We failed to remove old browser profiles from previous runs.
+
+This error will not affect or change the exit code.
+
+Error: Command 'Get-CimInstance -className win32_process | select Name,ProcessId,ParentProcessId,CommandLine,ExecutablePath' terminated with code: 1
+    at ChildProcess.<anonymous> (<embedded>:807:1002854)
+    at ChildProcess.emit (node:events:519:28)
+    at maybeClose (node:internal/child_process:1101:16)
+    at Socket.<anonymous> (node:internal/child_process:456:11)
+    at Socket.emit (node:events:519:28)
+    at Pipe.<anonymous> (node:net:346:12)
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        15.18.1                                                                        │
+  │ Browser:        Electron 138 (headless)                                                        │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (login.cy.js)                                                          │
+  │ Searched:       D:\Proyectos\QAFlow_Manufacturing_Testing_Portfolio\05_Automatizacion_Cypress\ │
+  │                 cypress\e2e\login.cy.js                                                        │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  login.cy.js                                                                     (1 of 1)
+
+
+  QAFlow - autenticación
+[Cypress QAFlow] Ejecutando: QAFlow - autenticación > CY-LOGIN-001 permite iniciar sesión con credenciales válidas
+    √ CY-LOGIN-001 permite iniciar sesión con credenciales válidas (1346ms)
+[Cypress QAFlow] Ejecutando: QAFlow - autenticación > CY-LOGIN-002 rechaza credenciales incorrectas
+    √ CY-LOGIN-002 rechaza credenciales incorrectas (1215ms)
+[Cypress QAFlow] Ejecutando: QAFlow - autenticación > CY-LOGIN-003 valida los campos obligatorios sin enviar la solicitud
+    √ CY-LOGIN-003 valida los campos obligatorios sin enviar la solicitud (480ms)
+[Cypress QAFlow] Ejecutando: QAFlow - autenticación > CY-LOGIN-004 permite cerrar una sesión autenticada
+    √ CY-LOGIN-004 permite cerrar una sesión autenticada (1213ms)
+
+
+  4 passing (4s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        4                                                                                │
+  │ Passing:      4                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  4                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     4 seconds                                                                        │
+  │ Spec Ran:     login.cy.js                                                                      │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  D:\Proyectos\QAFlow_Manufacturing_Testing_Portfolio\05_Automatizacion_Cypress\Ev     (1280x720)
+     idencias\screenshots\login.cy.js\CY-LOGIN-001_login_exitoso.png                                
+  -  D:\Proyectos\QAFlow_Manufacturing_Testing_Portfolio\05_Automatizacion_Cypress\Ev     (1280x720)
+     idencias\screenshots\login.cy.js\CY-LOGIN-002_login_incorrecto.png                             
+  -  D:\Proyectos\QAFlow_Manufacturing_Testing_Portfolio\05_Automatizacion_Cypress\Ev     (1280x720)
+     idencias\screenshots\login.cy.js\CY-LOGIN-003_campos_vacios.png                                
+  -  D:\Proyectos\QAFlow_Manufacturing_Testing_Portfolio\05_Automatizacion_Cypress\Ev     (1280x720)
+     idencias\screenshots\login.cy.js\CY-LOGIN-004_cierre_sesion.png                                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ √  login.cy.js                              00:04        4        4        -        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    √  All specs passed!                        00:04        4        4        -        -        -

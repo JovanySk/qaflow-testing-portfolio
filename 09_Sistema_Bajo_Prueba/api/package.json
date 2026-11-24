@@ -1,0 +1,19 @@
+{
+  "name": "qaflow-manufacturing-sut",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistema simplificado utilizado como objeto de pruebas para QAFlow.",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "mysql2": "^3.14.4"
+  }
+}

@@ -1,0 +1,3135 @@
+{
+  "collection": {
+    "_": {
+      "postman_id": "4e6f4c27-f957-4b12-b60d-4a35c6aaf301"
+    },
+    "item": [
+      {
+        "id": "a43423d7-b5d5-445f-b7a1-21c8665adaa6",
+        "name": "01 - Login exitoso",
+        "request": {
+          "description": {
+            "content": "Autentica al usuario administrador local y almacena el token en authToken.",
+            "type": "text/plain"
+          },
+          "url": {
+            "path": [
+              "api",
+              "auth",
+              "login"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"username\": \"qa.admin\",\n  \"password\": \"QaflowDemo#2026\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "auth": {
+            "type": "noauth",
+            "noauth": []
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "a3e4306d-6500-4a15-8601-d98b5c22ba0f",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('HTTP 200', function () {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "",
+                "pm.test('Login devuelve token y usuario con tipos válidos', function () {",
+                "    const body = pm.response.json();",
+                "    pm.expect(body).to.have.property('data').that.is.an('object');",
+                "    pm.expect(body.data).to.have.all.keys('token', 'user');",
+                "    pm.expect(body.data.token).to.be.a('string').and.not.empty;",
+                "    pm.expect(body.data.user).to.be.an('object');",
+                "    pm.expect(body.data.user).to.include.all.keys('id', 'username', 'role');",
+                "    pm.expect(body.data.user.id).to.be.a('number');",
+                "    pm.expect(body.data.user.username).to.be.a('string').and.equal('qa.admin');",
+                "    pm.expect(body.data.user.role).to.be.a('string').and.equal('ADMIN');",
+                "    pm.environment.set('authToken', body.data.token);",
+                "});"
+              ],
+              "_lastExecutionId": "409e0c6f-baa9-4d47-925e-487b5e48ef27"
+            }
+          }
+        ]
+      },
+      {
+        "id": "58c5c013-b2ba-438f-9045-29a9debec643",
+        "name": "02 - Login incorrecto",
+        "request": {
+          "description": {
+            "content": "Valida el rechazo controlado de una contraseña incorrecta.",
+            "type": "text/plain"
+          },
+          "url": {
+            "path": [
+              "api",
+              "auth",
+              "login"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"username\": \"qa.admin\",\n  \"password\": \"credencial-incorrecta\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "auth": {
+            "type": "noauth",
+            "noauth": []
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "3ee3b950-e345-4fa6-acc6-d561edea6ef4",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('HTTP 401', function () {",
+                "    pm.response.to.have.status(401);",
+                "});",
+                "",
+                "pm.test('Error de credenciales contiene campos obligatorios', function () {",
+                "    const body = pm.response.json();",
+                "    pm.expect(body).to.have.property('error').that.is.an('object');",
+                "    pm.expect(body.error).to.have.all.keys('code', 'message');",
+                "    pm.expect(body.error.code).to.be.a('string').and.equal('INVALID_CREDENTIALS');",
+                "    pm.expect(body.error.message).to.be.a('string').and.equal('Credenciales incorrectas.');",
+                "});"
+              ],
+              "_lastExecutionId": "49cb0ac9-b31f-499e-b4a6-4b78381eee2a"
+            }
+          }
+        ]
+      },
+      {
+        "id": "ef645a83-1429-4167-875f-b04fd779d6ac",
+        "name": "03 - Consultar productos",
+        "request": {
+          "description": {
+            "content": "Consulta todos los productos usando el token almacenado.",
+            "type": "text/plain"
+          },
+          "url": {
+            "path": [
+              "api",
+              "products"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "GET"
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "bc0c3d30-b483-410e-9670-330c062876a7",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('HTTP 200', function () {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "",
+                "pm.test('La colección de productos tiene estructura y tipos válidos', function () {",
+                "    const body = pm.response.json();",
+                "    pm.expect(body).to.have.property('data').that.is.an('array');",
+                "    pm.expect(body.data.length).to.be.above(0);",
+                "    body.data.forEach(function (product) {",
+                "        pm.expect(product).to.include.all.keys('id', 'sku', 'name', 'unitPrice', 'stock', 'active');",
+                "        pm.expect(product.id).to.be.a('number');",
+                "        pm.expect(product.sku).to.be.a('string').and.not.empty;",
+                "        pm.expect(product.name).to.be.a('string').and.not.empty;",
+                "        pm.expect(product.unitPrice).to.be.a('number');",
+                "        pm.expect(product.stock).to.be.a('number');",
+                "        pm.expect(product.active).to.be.a('number');",
+                "    });",
+                "});"
+              ],
+              "_lastExecutionId": "640f9ab1-4a3a-41ea-9740-3f84a9d6b301"
+            }
+          }
+        ]
+      },
+      {
+        "id": "ddfe7a33-eca9-4e9d-bd4b-fc9cdb00264c",
+        "name": "04 - Crear producto",
+        "request": {
+          "description": {
+            "content": "Genera un SKU único, crea el producto y almacena productId y productSku.",
+            "type": "text/plain"
+          },
+          "url": {
+            "path": [
+              "api",
+              "products"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"sku\": \"{{productSku}}\",\n  \"name\": \"Componente Postman QA\",\n  \"description\": \"Producto dinámico creado por la colección QAFlow.\",\n  \"unitPrice\": 275.50\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "prerequest",
+            "script": {
+              "id": "b3ca5963-ff84-4fa5-a043-2830a4c34f11",
+              "type": "text/javascript",
+              "exec": [
+                "const uniqueSku = `QA-PM-${Date.now()}-${pm.variables.replaceIn('{{$randomInt}}')}`;",
+                "pm.environment.set('productSku', uniqueSku);"
+              ],
+              "_lastExecutionId": "602df42c-46e7-4bc9-8aef-a3439f92f017"
+            }
+          },
+          {
+            "listen": "test",
+            "script": {
+              "id": "eeab462a-a9f6-40f3-8659-a45c22eab2e0",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('HTTP 201', function () {",
+                "    pm.response.to.have.status(201);",
+                "});",
+                "",
+                "pm.test('Producto creado contiene campos y tipos obligatorios', function () {",
+                "    const body = pm.response.json();",
+                "    pm.expect(body).to.have.property('data').that.is.an('object');",
+                "    pm.expect(body.data).to.include.all.keys('id', 'sku', 'name', 'description', 'unitPrice', 'stock', 'active');",
+                "    pm.expect(body.data.id).to.be.a('number');",
+                "    pm.expect(body.data.sku).to.be.a('string').and.equal(pm.environment.get('productSku'));",
+                "    pm.expect(body.data.name).to.be.a('string').and.not.empty;",
+                "    pm.expect(body.data.unitPrice).to.be.a('number').and.equal(275.5);",
+                "    pm.expect(body.data.stock).to.be.a('number').and.equal(0);",
+                "    pm.expect(body.data.active).to.be.a('boolean').and.equal(true);",
+                "    pm.environment.set('productId', String(body.data.id));",
+                "});"
+              ],
+              "_lastExecutionId": "8f4ca3a2-c666-4c43-93e4-ea3743dad865"
+            }
+          }
+        ]
+      },
+      {
+        "id": "3445a883-797f-4c5c-9e91-f0d669059d3a",
+        "name": "05 - Rechazar SKU duplicado",
+        "request": {
+          "description": {
+            "content": "Reutiliza productSku para validar el HTTP 409.",
+            "type": "text/plain"
+          },
+          "url": {
+            "path": [
+              "api",
+              "products"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"sku\": \"{{productSku}}\",\n  \"name\": \"Producto duplicado\",\n  \"description\": \"Debe ser rechazado por la restricción única.\",\n  \"unitPrice\": 275.50\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "a4a155d7-db2a-4cd3-829a-a3121e8311c2",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('HTTP 409', function () {",
+                "    pm.response.to.have.status(409);",
+                "});",
+                "",
+                "pm.test('El error identifica el SKU duplicado', function () {",
+                "    const body = pm.response.json();",
+                "    pm.expect(body).to.have.property('error').that.is.an('object');",
+                "    pm.expect(body.error).to.have.all.keys('code', 'message');",
+                "    pm.expect(body.error.code).to.be.a('string').and.equal('DUPLICATE_SKU');",
+                "    pm.expect(body.error.message).to.be.a('string').and.include(pm.environment.get('productSku'));",
+                "});"
+              ],
+              "_lastExecutionId": "95ee4f9c-0a7a-4217-8c58-f472de92bf2e"
+            }
+          }
+        ]
+      },
+      {
+        "id": "f0764ad9-28a3-489f-b82a-7a8142ea8319",
+        "name": "06 - Rechazar salida con stock insuficiente",
+        "request": {
+          "description": {
+            "content": "Solicita una salida superior al stock cero del producto recién creado.",
+            "type": "text/plain"
+          },
+          "url": {
+            "path": [
+              "api",
+              "inventory",
+              "movements"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"productId\": {{productId}},\n  \"type\": \"EXIT\",\n  \"quantity\": 999999,\n  \"notes\": \"Solicitud intencionalmente superior al stock disponible.\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "2629ba71-b9dd-446b-a4e7-a9499d96ace2",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('HTTP 409', function () {",
+                "    pm.response.to.have.status(409);",
+                "});",
+                "",
+                "pm.test('El error de stock contiene mensaje, código y detalle tipado', function () {",
+                "    const body = pm.response.json();",
+                "    pm.expect(body).to.have.property('error').that.is.an('object');",
+                "    pm.expect(body.error).to.include.all.keys('code', 'message', 'details');",
+                "    pm.expect(body.error.code).to.be.a('string').and.equal('INSUFFICIENT_STOCK');",
+                "    pm.expect(body.error.message).to.be.a('string').and.include('Stock insuficiente');",
+                "    pm.expect(body.error.details).to.have.all.keys('availableStock', 'requestedQuantity');",
+                "    pm.expect(body.error.details.availableStock).to.be.a('number').and.equal(0);",
+                "    pm.expect(body.error.details.requestedQuantity).to.be.a('number').and.equal(999999);",
+                "});"
+              ],
+              "_lastExecutionId": "375aeac2-cbba-4051-985b-1c6b7e958dc6"
+            }
+          }
+        ]
+      }
+    ],
+    "auth": {
+      "type": "bearer",
+      "bearer": [
+        {
+          "type": "string",
+          "value": "{{authToken}}",
+          "key": "token"
+        }
+      ]
+    },
+    "event": [
+      {
+        "listen": "test",
+        "script": {
+          "id": "61cc96da-a63f-446e-9c3c-0ab6395fc189",
+          "type": "text/javascript",
+          "exec": [
+            "pm.test('Tiempo de respuesta menor a 2000 ms', function () {",
+            "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+            "});",
+            "",
+            "pm.test('Content-Type es JSON', function () {",
+            "    const contentType = pm.response.headers.get('Content-Type');",
+            "    pm.expect(contentType, 'Content-Type obligatorio').to.be.a('string');",
+            "    pm.expect(contentType.toLowerCase()).to.include('application/json');",
+            "});",
+            "",
+            "pm.test('La respuesta contiene una estructura JSON raíz válida', function () {",
+            "    const body = pm.response.json();",
+            "    pm.expect(body).to.be.an('object');",
+            "    pm.expect(Object.prototype.hasOwnProperty.call(body, 'data') || Object.prototype.hasOwnProperty.call(body, 'error')).to.equal(true);",
+            "});"
+          ],
+          "_lastExecutionId": "6652bf50-262e-40d5-bb22-1a0ff2762b37"
+        }
+      }
+    ],
+    "variable": [],
+    "info": {
+      "_postman_id": "4e6f4c27-f957-4b12-b60d-4a35c6aaf301",
+      "name": "QAFlow Manufacturing API",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "description": {
+        "content": "Colección importable para validar los endpoints críticos del sistema simplificado utilizado como objeto de pruebas. Ejecutar en el orden definido para conservar las variables dinámicas.",
+        "type": "text/plain"
+      }
+    }
+  },
+  "environment": {
+    "_": {
+      "postman_variable_scope": "environment",
+      "postman_exported_at": "2026-07-19T23:30:00.000Z",
+      "postman_exported_using": "QAFlow Manufacturing Testing Portfolio"
+    },
+    "id": "d5c9d2d8-8f94-4e76-9cd5-7d47c747ee01",
+    "name": "QAFlow Local",
+    "values": [
+      {
+        "type": "any",
+        "value": "http://127.0.0.1:3000",
+        "key": "baseUrl"
+      },
+      {
+        "type": "any",
+        "value": "d4ab32dbc0d51be1ed243579e9db959a65146f54bc7fb9bf6db636afd4a73d8a",
+        "key": "authToken"
+      },
+      {
+        "type": "any",
+        "value": "8",
+        "key": "productId"
+      },
+      {
+        "type": "any",
+        "value": "QA-PM-1784554453590-241",
+        "key": "productSku"
+      }
+    ]
+  },
+  "globals": {
+    "id": "6ea268ea-07f8-4895-98a5-2fb1303de487",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 6,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 13,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 6,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 6,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 6,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 30,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 12,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 57.5,
+      "responseMin": 12,
+      "responseMax": 194,
+      "responseSd": 64.78875931311953,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1784554453002,
+      "completed": 1784554453978
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 6,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "bd692fe1-c7f4-4a0d-b33a-990d82cbed51",
+          "httpRequestId": "c0ca856d-b25e-4719-a1f3-023175594b18"
+        },
+        "item": {
+          "id": "a43423d7-b5d5-445f-b7a1-21c8665adaa6",
+          "name": "01 - Login exitoso",
+          "request": {
+            "description": {
+              "content": "Autentica al usuario administrador local y almacena el token en authToken.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"qa.admin\",\n  \"password\": \"QaflowDemo#2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth",
+              "noauth": []
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "a3e4306d-6500-4a15-8601-d98b5c22ba0f",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Login devuelve token y usuario con tipos válidos', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('data').that.is.an('object');",
+                  "    pm.expect(body.data).to.have.all.keys('token', 'user');",
+                  "    pm.expect(body.data.token).to.be.a('string').and.not.empty;",
+                  "    pm.expect(body.data.user).to.be.an('object');",
+                  "    pm.expect(body.data.user).to.include.all.keys('id', 'username', 'role');",
+                  "    pm.expect(body.data.user.id).to.be.a('number');",
+                  "    pm.expect(body.data.user.username).to.be.a('string').and.equal('qa.admin');",
+                  "    pm.expect(body.data.user.role).to.be.a('string').and.equal('ADMIN');",
+                  "    pm.environment.set('authToken', body.data.token);",
+                  "});"
+                ],
+                "_lastExecutionId": "409e0c6f-baa9-4d47-925e-487b5e48ef27"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "Autentica al usuario administrador local y almacena el token en authToken.",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "api",
+              "auth",
+              "login"
+            ],
+            "host": [
+              "127",
+              "0",
+              "0",
+              "1"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "3c309e8d-abca-4208-9ad9-6a8b24368ae5",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "127.0.0.1:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "57",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"username\": \"qa.admin\",\n  \"password\": \"QaflowDemo#2026\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "auth": {
+            "type": "noauth",
+            "noauth": []
+          }
+        },
+        "response": {
+          "id": "7f7fcf48-29c3-49bd-8601-2b5d1872f755",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "138"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"8a-yFioXAqGgTdLBjOFvlNP3+9DXYY\""
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 20 Jul 2026 13:34:13 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              100,
+              97,
+              116,
+              97,
+              34,
+              58,
+              123,
+              34,
+              116,
+              111,
+              107,
+              101,
+              110,
+              34,
+              58,
+              34,
+              100,
+              52,
+              97,
+              98,
+              51,
+              50,
+              100,
+              98,
+              99,
+              48,
+              100,
+              53,
+              49,
+              98,
+              101,
+              49,
+              101,
+              100,
+              50,
+              52,
+              51,
+              53,
+              55,
+              57,
+              101,
+              57,
+              100,
+              98,
+              57,
+              53,
+              57,
+              97,
+              54,
+              53,
+              49,
+              52,
+              54,
+              102,
+              53,
+              52,
+              98,
+              99,
+              55,
+              102,
+              98,
+              57,
+              98,
+              102,
+              54,
+              100,
+              98,
+              54,
+              51,
+              54,
+              97,
+              102,
+              100,
+              52,
+              97,
+              55,
+              51,
+              100,
+              56,
+              97,
+              34,
+              44,
+              34,
+              117,
+              115,
+              101,
+              114,
+              34,
+              58,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              49,
+              44,
+              34,
+              117,
+              115,
+              101,
+              114,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              113,
+              97,
+              46,
+              97,
+              100,
+              109,
+              105,
+              110,
+              34,
+              44,
+              34,
+              114,
+              111,
+              108,
+              101,
+              34,
+              58,
+              34,
+              65,
+              68,
+              77,
+              73,
+              78,
+              34,
+              125,
+              125,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 194,
+          "responseSize": 138
+        },
+        "id": "a43423d7-b5d5-445f-b7a1-21c8665adaa6",
+        "assertions": [
+          {
+            "assertion": "Tiempo de respuesta menor a 2000 ms",
+            "skipped": false
+          },
+          {
+            "assertion": "Content-Type es JSON",
+            "skipped": false
+          },
+          {
+            "assertion": "La respuesta contiene una estructura JSON raíz válida",
+            "skipped": false
+          },
+          {
+            "assertion": "HTTP 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Login devuelve token y usuario con tipos válidos",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "766d16ab-9757-4dae-b27b-0d06f2ef8dee",
+          "length": 6,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "01720715-52cd-4d3c-be7a-fbcfff4dcb11"
+        },
+        "item": {
+          "id": "58c5c013-b2ba-438f-9045-29a9debec643",
+          "name": "02 - Login incorrecto",
+          "request": {
+            "description": {
+              "content": "Valida el rechazo controlado de una contraseña incorrecta.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"qa.admin\",\n  \"password\": \"credencial-incorrecta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth",
+              "noauth": []
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "3ee3b950-e345-4fa6-acc6-d561edea6ef4",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Error de credenciales contiene campos obligatorios', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('error').that.is.an('object');",
+                  "    pm.expect(body.error).to.have.all.keys('code', 'message');",
+                  "    pm.expect(body.error.code).to.be.a('string').and.equal('INVALID_CREDENTIALS');",
+                  "    pm.expect(body.error.message).to.be.a('string').and.equal('Credenciales incorrectas.');",
+                  "});"
+                ],
+                "_lastExecutionId": "49cb0ac9-b31f-499e-b4a6-4b78381eee2a"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "Valida el rechazo controlado de una contraseña incorrecta.",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "api",
+              "auth",
+              "login"
+            ],
+            "host": [
+              "127",
+              "0",
+              "0",
+              "1"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "fdf9d70e-9353-4f2f-a709-650ed6709e33",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "127.0.0.1:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "67",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"username\": \"qa.admin\",\n  \"password\": \"credencial-incorrecta\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "auth": {
+            "type": "noauth",
+            "noauth": []
+          }
+        },
+        "response": {
+          "id": "25b09013-ea02-47f9-b577-117581542478",
+          "status": "Unauthorized",
+          "code": 401,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "78"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"4e-1ofOLXqwNd/HZJFiC7Q3fZEbWU0\""
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 20 Jul 2026 13:34:13 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              101,
+              114,
+              114,
+              111,
+              114,
+              34,
+              58,
+              123,
+              34,
+              99,
+              111,
+              100,
+              101,
+              34,
+              58,
+              34,
+              73,
+              78,
+              86,
+              65,
+              76,
+              73,
+              68,
+              95,
+              67,
+              82,
+              69,
+              68,
+              69,
+              78,
+              84,
+              73,
+              65,
+              76,
+              83,
+              34,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              67,
+              114,
+              101,
+              100,
+              101,
+              110,
+              99,
+              105,
+              97,
+              108,
+              101,
+              115,
+              32,
+              105,
+              110,
+              99,
+              111,
+              114,
+              114,
+              101,
+              99,
+              116,
+              97,
+              115,
+              46,
+              34,
+              125,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 77,
+          "responseSize": 78
+        },
+        "id": "58c5c013-b2ba-438f-9045-29a9debec643",
+        "assertions": [
+          {
+            "assertion": "Tiempo de respuesta menor a 2000 ms",
+            "skipped": false
+          },
+          {
+            "assertion": "Content-Type es JSON",
+            "skipped": false
+          },
+          {
+            "assertion": "La respuesta contiene una estructura JSON raíz válida",
+            "skipped": false
+          },
+          {
+            "assertion": "HTTP 401",
+            "skipped": false
+          },
+          {
+            "assertion": "Error de credenciales contiene campos obligatorios",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "d7a35e49-8f06-49cb-9d8e-963fa26e4b8c",
+          "length": 6,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "00d2bb0f-6da1-4bf7-932f-53c0989758c9"
+        },
+        "item": {
+          "id": "ef645a83-1429-4167-875f-b04fd779d6ac",
+          "name": "03 - Consultar productos",
+          "request": {
+            "description": {
+              "content": "Consulta todos los productos usando el token almacenado.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "products"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "bc0c3d30-b483-410e-9670-330c062876a7",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('La colección de productos tiene estructura y tipos válidos', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('data').that.is.an('array');",
+                  "    pm.expect(body.data.length).to.be.above(0);",
+                  "    body.data.forEach(function (product) {",
+                  "        pm.expect(product).to.include.all.keys('id', 'sku', 'name', 'unitPrice', 'stock', 'active');",
+                  "        pm.expect(product.id).to.be.a('number');",
+                  "        pm.expect(product.sku).to.be.a('string').and.not.empty;",
+                  "        pm.expect(product.name).to.be.a('string').and.not.empty;",
+                  "        pm.expect(product.unitPrice).to.be.a('number');",
+                  "        pm.expect(product.stock).to.be.a('number');",
+                  "        pm.expect(product.active).to.be.a('number');",
+                  "    });",
+                  "});"
+                ],
+                "_lastExecutionId": "640f9ab1-4a3a-41ea-9740-3f84a9d6b301"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "Consulta todos los productos usando el token almacenado.",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "api",
+              "products"
+            ],
+            "host": [
+              "127",
+              "0",
+              "0",
+              "1"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Accept",
+              "value": "application/json"
+            },
+            {
+              "key": "Authorization",
+              "value": "Bearer d4ab32dbc0d51be1ed243579e9db959a65146f54bc7fb9bf6db636afd4a73d8a",
+              "system": true
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "d02d0ae5-1c9e-47b8-80fa-592eac625005",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "127.0.0.1:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET",
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "type": "string",
+                "value": "d4ab32dbc0d51be1ed243579e9db959a65146f54bc7fb9bf6db636afd4a73d8a",
+                "key": "token"
+              }
+            ]
+          }
+        },
+        "response": {
+          "id": "095040a9-2efb-47e5-9d8d-c8229ff9ed40",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "523"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"20b-RFwIZzNT7vuDU7OIKuW2C5+PyL8\""
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 20 Jul 2026 13:34:13 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              100,
+              97,
+              116,
+              97,
+              34,
+              58,
+              91,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              49,
+              44,
+              34,
+              115,
+              107,
+              117,
+              34,
+              58,
+              34,
+              81,
+              65,
+              45,
+              82,
+              65,
+              87,
+              45,
+              48,
+              48,
+              49,
+              34,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              76,
+              195,
+              161,
+              109,
+              105,
+              110,
+              97,
+              32,
+              100,
+              101,
+              32,
+              97,
+              99,
+              101,
+              114,
+              111,
+              34,
+              44,
+              34,
+              100,
+              101,
+              115,
+              99,
+              114,
+              105,
+              112,
+              116,
+              105,
+              111,
+              110,
+              34,
+              58,
+              34,
+              77,
+              97,
+              116,
+              101,
+              114,
+              105,
+              97,
+              32,
+              112,
+              114,
+              105,
+              109,
+              97,
+              32,
+              112,
+              97,
+              114,
+              97,
+              32,
+              112,
+              114,
+              117,
+              101,
+              98,
+              97,
+              115,
+              32,
+              100,
+              101,
+              32,
+              105,
+              110,
+              118,
+              101,
+              110,
+              116,
+              97,
+              114,
+              105,
+              111,
+              46,
+              34,
+              44,
+              34,
+              117,
+              110,
+              105,
+              116,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              49,
+              56,
+              53,
+              46,
+              53,
+              44,
+              34,
+              115,
+              116,
+              111,
+              99,
+              107,
+              34,
+              58,
+              50,
+              52,
+              44,
+              34,
+              97,
+              99,
+              116,
+              105,
+              118,
+              101,
+              34,
+              58,
+              49,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              55,
+              45,
+              50,
+              48,
+              84,
+              49,
+              50,
+              58,
+              53,
+              54,
+              58,
+              50,
+              50,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              125,
+              44,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              50,
+              44,
+              34,
+              115,
+              107,
+              117,
+              34,
+              58,
+              34,
+              81,
+              65,
+              45,
+              70,
+              73,
+              78,
+              45,
+              48,
+              48,
+              49,
+              34,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              80,
+              97,
+              110,
+              101,
+              108,
+              32,
+              101,
+              110,
+              115,
+              97,
+              109,
+              98,
+              108,
+              97,
+              100,
+              111,
+              34,
+              44,
+              34,
+              100,
+              101,
+              115,
+              99,
+              114,
+              105,
+              112,
+              116,
+              105,
+              111,
+              110,
+              34,
+              58,
+              34,
+              80,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              32,
+              116,
+              101,
+              114,
+              109,
+              105,
+              110,
+              97,
+              100,
+              111,
+              32,
+              100,
+              101,
+              32,
+              114,
+              101,
+              102,
+              101,
+              114,
+              101,
+              110,
+              99,
+              105,
+              97,
+              46,
+              34,
+              44,
+              34,
+              117,
+              110,
+              105,
+              116,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              56,
+              57,
+              57,
+              44,
+              34,
+              115,
+              116,
+              111,
+              99,
+              107,
+              34,
+              58,
+              54,
+              44,
+              34,
+              97,
+              99,
+              116,
+              105,
+              118,
+              101,
+              34,
+              58,
+              49,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              55,
+              45,
+              50,
+              48,
+              84,
+              49,
+              50,
+              58,
+              53,
+              54,
+              58,
+              50,
+              50,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              125,
+              44,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              53,
+              44,
+              34,
+              115,
+              107,
+              117,
+              34,
+              58,
+              34,
+              81,
+              65,
+              45,
+              82,
+              65,
+              87,
+              45,
+              48,
+              48,
+              50,
+              34,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              84,
+              101,
+              106,
+              97,
+              100,
+              111,
+              34,
+              44,
+              34,
+              100,
+              101,
+              115,
+              99,
+              114,
+              105,
+              112,
+              116,
+              105,
+              111,
+              110,
+              34,
+              58,
+              110,
+              117,
+              108,
+              108,
+              44,
+              34,
+              117,
+              110,
+              105,
+              116,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              49,
+              53,
+              53,
+              46,
+              57,
+              56,
+              44,
+              34,
+              115,
+              116,
+              111,
+              99,
+              107,
+              34,
+              58,
+              48,
+              44,
+              34,
+              97,
+              99,
+              116,
+              105,
+              118,
+              101,
+              34,
+              58,
+              49,
+              44,
+              34,
+              99,
+              114,
+              101,
+              97,
+              116,
+              101,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              55,
+              45,
+              50,
+              48,
+              84,
+              49,
+              51,
+              58,
+              48,
+              51,
+              58,
+              53,
+              55,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              125,
+              93,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 12,
+          "responseSize": 523
+        },
+        "id": "ef645a83-1429-4167-875f-b04fd779d6ac",
+        "assertions": [
+          {
+            "assertion": "Tiempo de respuesta menor a 2000 ms",
+            "skipped": false
+          },
+          {
+            "assertion": "Content-Type es JSON",
+            "skipped": false
+          },
+          {
+            "assertion": "La respuesta contiene una estructura JSON raíz válida",
+            "skipped": false
+          },
+          {
+            "assertion": "HTTP 200",
+            "skipped": false
+          },
+          {
+            "assertion": "La colección de productos tiene estructura y tipos válidos",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "a77b106d-98ee-4907-99bf-c8dbdf9c1da6",
+          "length": 6,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "58062cc0-9ce4-4330-b233-6df36de474d7"
+        },
+        "item": {
+          "id": "ddfe7a33-eca9-4e9d-bd4b-fc9cdb00264c",
+          "name": "04 - Crear producto",
+          "request": {
+            "description": {
+              "content": "Genera un SKU único, crea el producto y almacena productId y productSku.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "products"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"{{productSku}}\",\n  \"name\": \"Componente Postman QA\",\n  \"description\": \"Producto dinámico creado por la colección QAFlow.\",\n  \"unitPrice\": 275.50\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "b3ca5963-ff84-4fa5-a043-2830a4c34f11",
+                "type": "text/javascript",
+                "exec": [
+                  "const uniqueSku = `QA-PM-${Date.now()}-${pm.variables.replaceIn('{{$randomInt}}')}`;",
+                  "pm.environment.set('productSku', uniqueSku);"
+                ],
+                "_lastExecutionId": "602df42c-46e7-4bc9-8aef-a3439f92f017"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "id": "eeab462a-a9f6-40f3-8659-a45c22eab2e0",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Producto creado contiene campos y tipos obligatorios', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('data').that.is.an('object');",
+                  "    pm.expect(body.data).to.include.all.keys('id', 'sku', 'name', 'description', 'unitPrice', 'stock', 'active');",
+                  "    pm.expect(body.data.id).to.be.a('number');",
+                  "    pm.expect(body.data.sku).to.be.a('string').and.equal(pm.environment.get('productSku'));",
+                  "    pm.expect(body.data.name).to.be.a('string').and.not.empty;",
+                  "    pm.expect(body.data.unitPrice).to.be.a('number').and.equal(275.5);",
+                  "    pm.expect(body.data.stock).to.be.a('number').and.equal(0);",
+                  "    pm.expect(body.data.active).to.be.a('boolean').and.equal(true);",
+                  "    pm.environment.set('productId', String(body.data.id));",
+                  "});"
+                ],
+                "_lastExecutionId": "8f4ca3a2-c666-4c43-93e4-ea3743dad865"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "Genera un SKU único, crea el producto y almacena productId y productSku.",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "api",
+              "products"
+            ],
+            "host": [
+              "127",
+              "0",
+              "0",
+              "1"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            },
+            {
+              "key": "Authorization",
+              "value": "Bearer d4ab32dbc0d51be1ed243579e9db959a65146f54bc7fb9bf6db636afd4a73d8a",
+              "system": true
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "ce73c52b-74f8-43be-93d0-36336611e810",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "127.0.0.1:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "168",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"sku\": \"QA-PM-1784554453590-241\",\n  \"name\": \"Componente Postman QA\",\n  \"description\": \"Producto dinámico creado por la colección QAFlow.\",\n  \"unitPrice\": 275.50\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "type": "string",
+                "value": "d4ab32dbc0d51be1ed243579e9db959a65146f54bc7fb9bf6db636afd4a73d8a",
+                "key": "token"
+              }
+            ]
+          }
+        },
+        "response": {
+          "id": "dfbd9534-075e-4b1c-9ece-f77e7065fbf3",
+          "status": "Created",
+          "code": 201,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "190"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"be-Ri0I6vkuJl179WXgOXd4OJTb850\""
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 20 Jul 2026 13:34:13 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              100,
+              97,
+              116,
+              97,
+              34,
+              58,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              56,
+              44,
+              34,
+              115,
+              107,
+              117,
+              34,
+              58,
+              34,
+              81,
+              65,
+              45,
+              80,
+              77,
+              45,
+              49,
+              55,
+              56,
+              52,
+              53,
+              53,
+              52,
+              52,
+              53,
+              51,
+              53,
+              57,
+              48,
+              45,
+              50,
+              52,
+              49,
+              34,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              67,
+              111,
+              109,
+              112,
+              111,
+              110,
+              101,
+              110,
+              116,
+              101,
+              32,
+              80,
+              111,
+              115,
+              116,
+              109,
+              97,
+              110,
+              32,
+              81,
+              65,
+              34,
+              44,
+              34,
+              100,
+              101,
+              115,
+              99,
+              114,
+              105,
+              112,
+              116,
+              105,
+              111,
+              110,
+              34,
+              58,
+              34,
+              80,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              111,
+              32,
+              100,
+              105,
+              110,
+              195,
+              161,
+              109,
+              105,
+              99,
+              111,
+              32,
+              99,
+              114,
+              101,
+              97,
+              100,
+              111,
+              32,
+              112,
+              111,
+              114,
+              32,
+              108,
+              97,
+              32,
+              99,
+              111,
+              108,
+              101,
+              99,
+              99,
+              105,
+              195,
+              179,
+              110,
+              32,
+              81,
+              65,
+              70,
+              108,
+              111,
+              119,
+              46,
+              34,
+              44,
+              34,
+              117,
+              110,
+              105,
+              116,
+              80,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              50,
+              55,
+              53,
+              46,
+              53,
+              44,
+              34,
+              115,
+              116,
+              111,
+              99,
+              107,
+              34,
+              58,
+              48,
+              44,
+              34,
+              97,
+              99,
+              116,
+              105,
+              118,
+              101,
+              34,
+              58,
+              116,
+              114,
+              117,
+              101,
+              125,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 17,
+          "responseSize": 190
+        },
+        "id": "ddfe7a33-eca9-4e9d-bd4b-fc9cdb00264c",
+        "assertions": [
+          {
+            "assertion": "Tiempo de respuesta menor a 2000 ms",
+            "skipped": false
+          },
+          {
+            "assertion": "Content-Type es JSON",
+            "skipped": false
+          },
+          {
+            "assertion": "La respuesta contiene una estructura JSON raíz válida",
+            "skipped": false
+          },
+          {
+            "assertion": "HTTP 201",
+            "skipped": false
+          },
+          {
+            "assertion": "Producto creado contiene campos y tipos obligatorios",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "3d883a9c-3950-40f1-a1e8-965b0f5dfd8d",
+          "length": 6,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "be5688b9-c48f-4bf1-9c0b-46ddf018d025"
+        },
+        "item": {
+          "id": "3445a883-797f-4c5c-9e91-f0d669059d3a",
+          "name": "05 - Rechazar SKU duplicado",
+          "request": {
+            "description": {
+              "content": "Reutiliza productSku para validar el HTTP 409.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "products"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"{{productSku}}\",\n  \"name\": \"Producto duplicado\",\n  \"description\": \"Debe ser rechazado por la restricción única.\",\n  \"unitPrice\": 275.50\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "a4a155d7-db2a-4cd3-829a-a3121e8311c2",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 409', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('El error identifica el SKU duplicado', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('error').that.is.an('object');",
+                  "    pm.expect(body.error).to.have.all.keys('code', 'message');",
+                  "    pm.expect(body.error.code).to.be.a('string').and.equal('DUPLICATE_SKU');",
+                  "    pm.expect(body.error.message).to.be.a('string').and.include(pm.environment.get('productSku'));",
+                  "});"
+                ],
+                "_lastExecutionId": "95ee4f9c-0a7a-4217-8c58-f472de92bf2e"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "Reutiliza productSku para validar el HTTP 409.",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "api",
+              "products"
+            ],
+            "host": [
+              "127",
+              "0",
+              "0",
+              "1"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            },
+            {
+              "key": "Authorization",
+              "value": "Bearer d4ab32dbc0d51be1ed243579e9db959a65146f54bc7fb9bf6db636afd4a73d8a",
+              "system": true
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "b1472985-403f-4907-97c0-3439780529a8",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "127.0.0.1:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "160",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"sku\": \"QA-PM-1784554453590-241\",\n  \"name\": \"Producto duplicado\",\n  \"description\": \"Debe ser rechazado por la restricción única.\",\n  \"unitPrice\": 275.50\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "type": "string",
+                "value": "d4ab32dbc0d51be1ed243579e9db959a65146f54bc7fb9bf6db636afd4a73d8a",
+                "key": "token"
+              }
+            ]
+          }
+        },
+        "response": {
+          "id": "5ee64c1d-cc6a-4794-8ce6-fd8d10e40c35",
+          "status": "Conflict",
+          "code": 409,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "88"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"58-i4CzbpUVRiNaMarPLABpxhdgw0o\""
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 20 Jul 2026 13:34:13 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              101,
+              114,
+              114,
+              111,
+              114,
+              34,
+              58,
+              123,
+              34,
+              99,
+              111,
+              100,
+              101,
+              34,
+              58,
+              34,
+              68,
+              85,
+              80,
+              76,
+              73,
+              67,
+              65,
+              84,
+              69,
+              95,
+              83,
+              75,
+              85,
+              34,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              69,
+              108,
+              32,
+              83,
+              75,
+              85,
+              32,
+              81,
+              65,
+              45,
+              80,
+              77,
+              45,
+              49,
+              55,
+              56,
+              52,
+              53,
+              53,
+              52,
+              52,
+              53,
+              51,
+              53,
+              57,
+              48,
+              45,
+              50,
+              52,
+              49,
+              32,
+              121,
+              97,
+              32,
+              101,
+              120,
+              105,
+              115,
+              116,
+              101,
+              46,
+              34,
+              125,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 20,
+          "responseSize": 88
+        },
+        "id": "3445a883-797f-4c5c-9e91-f0d669059d3a",
+        "assertions": [
+          {
+            "assertion": "Tiempo de respuesta menor a 2000 ms",
+            "skipped": false
+          },
+          {
+            "assertion": "Content-Type es JSON",
+            "skipped": false
+          },
+          {
+            "assertion": "La respuesta contiene una estructura JSON raíz válida",
+            "skipped": false
+          },
+          {
+            "assertion": "HTTP 409",
+            "skipped": false
+          },
+          {
+            "assertion": "El error identifica el SKU duplicado",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "9c0ad176-800c-46e0-a78e-9873fb5e4bb7",
+          "length": 6,
+          "cycles": 1,
+          "position": 5,
+          "iteration": 0,
+          "httpRequestId": "4d81dece-906d-4ba8-9cac-28bde2a9bd65"
+        },
+        "item": {
+          "id": "f0764ad9-28a3-489f-b82a-7a8142ea8319",
+          "name": "06 - Rechazar salida con stock insuficiente",
+          "request": {
+            "description": {
+              "content": "Solicita una salida superior al stock cero del producto recién creado.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "inventory",
+                "movements"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{productId}},\n  \"type\": \"EXIT\",\n  \"quantity\": 999999,\n  \"notes\": \"Solicitud intencionalmente superior al stock disponible.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "2629ba71-b9dd-446b-a4e7-a9499d96ace2",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 409', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('El error de stock contiene mensaje, código y detalle tipado', function () {",
+                  "    const body = pm.response.json();",
+                  "    pm.expect(body).to.have.property('error').that.is.an('object');",
+                  "    pm.expect(body.error).to.include.all.keys('code', 'message', 'details');",
+                  "    pm.expect(body.error.code).to.be.a('string').and.equal('INSUFFICIENT_STOCK');",
+                  "    pm.expect(body.error.message).to.be.a('string').and.include('Stock insuficiente');",
+                  "    pm.expect(body.error.details).to.have.all.keys('availableStock', 'requestedQuantity');",
+                  "    pm.expect(body.error.details.availableStock).to.be.a('number').and.equal(0);",
+                  "    pm.expect(body.error.details.requestedQuantity).to.be.a('number').and.equal(999999);",
+                  "});"
+                ],
+                "_lastExecutionId": "375aeac2-cbba-4051-985b-1c6b7e958dc6"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "Solicita una salida superior al stock cero del producto recién creado.",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "http",
+            "port": "3000",
+            "path": [
+              "api",
+              "inventory",
+              "movements"
+            ],
+            "host": [
+              "127",
+              "0",
+              "0",
+              "1"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            },
+            {
+              "key": "Authorization",
+              "value": "Bearer d4ab32dbc0d51be1ed243579e9db959a65146f54bc7fb9bf6db636afd4a73d8a",
+              "system": true
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "bda3fab3-9d3e-402e-9d9e-7572734496fa",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "127.0.0.1:3000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "131",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"productId\": 8,\n  \"type\": \"EXIT\",\n  \"quantity\": 999999,\n  \"notes\": \"Solicitud intencionalmente superior al stock disponible.\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          },
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "type": "string",
+                "value": "d4ab32dbc0d51be1ed243579e9db959a65146f54bc7fb9bf6db636afd4a73d8a",
+                "key": "token"
+              }
+            ]
+          }
+        },
+        "response": {
+          "id": "3db7083e-0dc5-4326-b5a1-9a0380cd0d37",
+          "status": "Conflict",
+          "code": 409,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "164"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"a4-OPoz9TZAh/HcTiqyU1jh8+JbG1Y\""
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 20 Jul 2026 13:34:13 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              101,
+              114,
+              114,
+              111,
+              114,
+              34,
+              58,
+              123,
+              34,
+              99,
+              111,
+              100,
+              101,
+              34,
+              58,
+              34,
+              73,
+              78,
+              83,
+              85,
+              70,
+              70,
+              73,
+              67,
+              73,
+              69,
+              78,
+              84,
+              95,
+              83,
+              84,
+              79,
+              67,
+              75,
+              34,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              83,
+              116,
+              111,
+              99,
+              107,
+              32,
+              105,
+              110,
+              115,
+              117,
+              102,
+              105,
+              99,
+              105,
+              101,
+              110,
+              116,
+              101,
+              46,
+              32,
+              68,
+              105,
+              115,
+              112,
+              111,
+              110,
+              105,
+              98,
+              108,
+              101,
+              58,
+              32,
+              48,
+              59,
+              32,
+              115,
+              111,
+              108,
+              105,
+              99,
+              105,
+              116,
+              97,
+              100,
+              111,
+              58,
+              32,
+              57,
+              57,
+              57,
+              57,
+              57,
+              57,
+              46,
+              34,
+              44,
+              34,
+              100,
+              101,
+              116,
+              97,
+              105,
+              108,
+              115,
+              34,
+              58,
+              123,
+              34,
+              97,
+              118,
+              97,
+              105,
+              108,
+              97,
+              98,
+              108,
+              101,
+              83,
+              116,
+              111,
+              99,
+              107,
+              34,
+              58,
+              48,
+              44,
+              34,
+              114,
+              101,
+              113,
+              117,
+              101,
+              115,
+              116,
+              101,
+              100,
+              81,
+              117,
+              97,
+              110,
+              116,
+              105,
+              116,
+              121,
+              34,
+              58,
+              57,
+              57,
+              57,
+              57,
+              57,
+              57,
+              125,
+              125,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 25,
+          "responseSize": 164
+        },
+        "id": "f0764ad9-28a3-489f-b82a-7a8142ea8319",
+        "assertions": [
+          {
+            "assertion": "Tiempo de respuesta menor a 2000 ms",
+            "skipped": false
+          },
+          {
+            "assertion": "Content-Type es JSON",
+            "skipped": false
+          },
+          {
+            "assertion": "La respuesta contiene una estructura JSON raíz válida",
+            "skipped": false
+          },
+          {
+            "assertion": "HTTP 409",
+            "skipped": false
+          },
+          {
+            "assertion": "El error de stock contiene mensaje, código y detalle tipado",
+            "skipped": false
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 1181
+    },
+    "failures": [],
+    "error": null
+  }
+}
